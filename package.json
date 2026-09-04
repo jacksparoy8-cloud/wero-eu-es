@@ -1,0 +1,18 @@
+{
+  "name": "wero-eu-es",
+  "version": "1.0.0",
+  "description": "WERO Payment Platform",
+  "private": true,
+  "scripts": {
+    "build": "cd backend-nodejs && npm install"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
