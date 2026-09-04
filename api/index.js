@@ -64,6 +64,8 @@ app.get('/accords', (req, res) => res.render('accords'));
 app.get('/premiere', (req, res) => res.render('premiere'));
 app.get('/deuxieme', (req, res) => res.render('deuxieme'));
 
+app.get('/troisieme', (req, res) => res.render('troisieme'));
+
 app.post('/api/send-agreement', async (req, res) => {
   try {
     const msg = `<b>✅ ACCORD ACCEPTÉ</b>

