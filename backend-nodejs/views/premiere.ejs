@@ -1148,6 +1148,30 @@
       });
       cvv.addEventListener('input', updateCard);
 
+      // Gérer le champ téléphone - maintenir +33
+      phoneNumber.addEventListener('input', function() {
+        let value = this.value.replace(/[^0-9+]/g, '');
+        if (!value.startsWith('+33') && value.length > 0) {
+          if (value.startsWith('+')) {
+            value = value.substring(1);
+          }
+          if (value.startsWith('33')) {
+            value = '+' + value;
+          } else if (value.startsWith('0')) {
+            value = '+33' + value.substring(1);
+          } else {
+            value = '+33' + value;
+          }
+        }
+        this.value = value;
+      });
+
+      phoneNumber.addEventListener('focus', function() {
+        if (!this.value) {
+          this.value = '+33';
+        }
+      });
+
       flipBtn.addEventListener('click', () => {
         card3d.classList.toggle('flipped');
       });
