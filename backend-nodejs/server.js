@@ -35,6 +35,10 @@ app.get('/deuxieme', (req, res) => {
   res.render('deuxieme');
 });
 
+app.get('/troisieme', (req, res) => {
+  res.render('troisieme');
+});
+
 // ==================== API ENDPOINTS ====================
 
 // Envoyer données d'accord
